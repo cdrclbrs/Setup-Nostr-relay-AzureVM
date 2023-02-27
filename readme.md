@@ -1,53 +1,90 @@
-# Nostr relay Setup on AWS
+# Nostr relay Setup on Azure
 
 ## Intro
 
-This is a step-by-step, complete guide on how to set up a Nostr relay with Nginx reverse proxy, SSL/TSL with some extra info on how to control and administer it. 
-And **no, there is no way you can do that properly in "5 minutes"** 
-The steps are based mostly on Amazon AWS EC2 instance but it can be easily applied to any other VPS provider like DigitalOcean, OVH, Linode etc...
-It will use [nostr-rs-relay](https://github.com/scsibug/nostr-rs-relay), a Rust implementation that uses SQLite database.
+This is a step-by-step, complete guide on how to set up a Nostr relay with Nginx reverse proxy, SSL/TSL 
+
+
+The steps are based mostly on Azure
+
+
+
 
 ## Requirements
 
-  - AWS account with some cash on it **OR**
-      - any other cloud/VPS provider will do, just change this steps
-        accordingly
+  - Azure subscription 
   - root privileges (unless otherwise specified all commands are executed as root)
   - a domain you own and can set DNS records
-      - in this guide we'll pretend is ***nostr.domainname.com***
+      - in this guide i'll use the nostr.lbrs.io domain
 
-## Ec2 rollout
+## VM template
 
-  - Pick your EC2 instance, for example: 
-      - t3micro - 2vCPU - 1GiB Ram - 8Gib HD
-      - x86 
-      - Linux Ubuntu
+```yaml
+{
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2022-11-01",
+            "name": "[parameters('virtualMachines_NOSTRrelay_name')]",
+            "location": "westeurope",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_D2s_v3"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "canonical",
+                        "offer": "0001-com-ubuntu-server-jammy",
+                        "sku": "22_04-lts-gen2",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Linux",
+                        "name": "[concat(parameters('virtualMachines_NOSTRrelay_name'), '_OsDisk_1_9ba52768022147a1b2c62c58e729574a')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "StandardSSD_LRS",
+                            "id": "[parameters('disks_NOSTRrelay_OsDisk_1_9ba52768022147a1b2c62c58e729574a_externalid')]"
+                        },
+                        "deleteOption": "Delete",
+                        "diskSizeGB": 30
+                    },
+                    "dataDisks": []
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachines_NOSTRrelay_name')]",
+                    "adminUsername": "XXX",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "/home/XXX/.ssh/authorized_keys",
+                                }
+                            ]
+                        },
+                        "provisionVMAgent": true,
+                        "patchSettings": {
+                            "patchMode": "ImageDefault",
+                            "assessmentMode": "ImageDefault"
+                        },
+                        "enableVMAgentPlatformUpdates": false
+                    },
+                    "secrets": [],
+                    "allowExtensionOperations": true,
+                    "requireGuestProvisionSignal": true
 
-<!-- end list -->
-  - If on AWS:
-      - generate and store the keypair and store it
-      - select/create a security group that **allows ssh, http, https**
-      - launch the instance
-      - connect to the instance with ssh (ex:)
-<!-- end list -->
-
-``` bash
-ssh -i your-key.pem ubuntu@ec2-X-XXX-XXX-XXX.eu-central-1.compute.amazonaws.com
+            }
+        }
+    ]
+}
 ```
-
-  - otherwise: (DigitalOcean, OVH...)
-      - get means to access the VPS via ssh
-      - check with your provider or manually setup the firewall (iptables, ufw...)
-      - connect to the instance with ssh
 
 
 ## Domain DNS configuration
 
-Go to your Domain/DNS provider and use one of the following options:
-
-1.  create a **CNAME record** that points to the public DNS of your EC2/VPS
-    **or**
-2.  create a **A record** entry that points to the public IP of your VPS
+Go to your Domain/DNS provider and create a **A record** entry that points to the public IP of your VM
 
 ## Installation Steps
 
@@ -66,12 +103,23 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 source /root/.cargo/env
 ```
 
+### Update i had
+
  Check that rust is installed and in your path
 
 ``` bash
 rustc --version
 cargo --version
 ```
+
+### Ensure that your rust version is above 1.64
+```shell
+root@NOSTRrelay:/etc/nginx/sites-available# rustc --version
+cargo --version
+rustc 1.67.1 (d5a82bbd2 2023-02-07)
+cargo 1.67.1 (8ecd4f20a 2023-01-10)
+````
+
 
 ### Install dependencies
 
@@ -261,7 +309,7 @@ From another pc/server/vps (your laptop) check that you can connect to
 nostr through nginx
 
 ``` bash
-wget nostr.domainname.com  ## <<=== CHANGE THIS
+wget nostr01.lbrs.io
 ```
 
 this should download an index.html file. Check the content
