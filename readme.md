@@ -509,6 +509,12 @@ https://websocketking.com/
 ```
 ![image](https://raw.githubusercontent.com/cdrclbrs/Setup-Nostr-relay-AzureVM/main/screenshots/WebsocketKing.png)
 
+
+## Add your relay in your Nostr client (Damus)
+
+![image](https://raw.githubusercontent.com/cdrclbrs/Setup-Nostr-relay-AzureVM/main/screenshots/damus.png)
+
+
 ## See it at work
 
 This section is mostly sysadmin related but can be very useful when
