@@ -5,9 +5,8 @@
 This is a step-by-step, complete guide on how to set up a Nostr relay with Nginx reverse proxy, SSL/TSL 
 
 
-The steps are based mostly on Azure
-
-
+The steps are based mostly on Azure 
+Some content of this setup where adapted based on errors i could encounter, and this setup step-by-step is comming fron BlockChainCaffe reporsitory for AWS deployment.
 
 
 ## Requirements
