@@ -368,6 +368,8 @@ If all goes well do the **real** certificate request
 cd /var/www/nostr
 certbot certonly --webroot -w . -d nostr.domainname.com ## <<== Change with your domain
 ```
+![image](https://github.com/cdrclbrs/Setup-Nostr-relay-AzureVM/blob/main/screenshots/dryrun%20succcess.png)
+
 
 The issued certificates will be found in letsencrypt folder
 
@@ -383,6 +385,7 @@ lrwxrwxrwx 1 root root   53 Jan  9 09:04 fullchain.pem -> ../../archive/nostr.do
 lrwxrwxrwx 1 root root   51 Jan  9 09:04 privkey.pem -> ../../archive/nostr.domainname.com/privkey1.pem
 
 ```
+![image](https://raw.githubusercontent.com/cdrclbrs/Setup-Nostr-relay-AzureVM/main/screenshots/letsencrypt.png)
 
 Now that you have a valid certificate set, replace the nginx configuration file to use it
 
@@ -504,7 +507,7 @@ Please use a Nostr client to connect
 ```bash
 https://websocketking.com/
 ```
-
+![image](https://raw.githubusercontent.com/cdrclbrs/Setup-Nostr-relay-AzureVM/main/screenshots/WebsocketKing.png)
 
 ## See it at work
 
