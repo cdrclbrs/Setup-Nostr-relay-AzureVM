@@ -477,6 +477,13 @@ cat index.html
 Please use a Nostr client to connect
 ```
 
+### you can test your server at url
+
+```bash
+https://websocketking.com/
+```
+
+
 ## See it at work
 
 This section is mostly sysadmin related but can be very useful when
